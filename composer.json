@@ -1,0 +1,25 @@
+{
+    "name": "pulseframe/base",
+    "description": "The new laravel replacement. Super lightweight, fast, easy to work with, and much more!",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "PulseFrame\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "KingMaj0r"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "twig/twig": "^3.10",
+        "illuminate/routing": "^11.7",
+        "illuminate/events": "^11.7",
+        "symfony/console": "^7.1",
+        "symfony/yaml": "^7.0",
+        "vlucas/phpdotenv": "^5.6"
+    }
+}
