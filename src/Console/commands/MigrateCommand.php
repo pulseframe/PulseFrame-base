@@ -25,7 +25,7 @@ class MigrateCommand extends Command
       require_once $file;
       $fileName = basename($file, '.php');
       $className = $this->getClassNameFromFileName($fileName);
-      $fullClassName = "\\PulseFrame\\database\\migrations\\$className";
+      $fullClassName = "\\App\\database\\migrations\\$className";
 
       if (class_exists($fullClassName)) {
         $migration = new $fullClassName();
