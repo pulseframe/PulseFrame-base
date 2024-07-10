@@ -11,7 +11,7 @@ class AuthMiddleware
   public function handle(Request $request, Closure $next)
   {
     if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
-      $user = Database::find("usersModel", $_SESSION['email']);
+      $user = Database::find("UsersModel", $_SESSION['email']);
 
       if ($user === false || $_SESSION['name'] !== $user['name'] || $_SESSION['email'] !== $user['email'] || $_SESSION['role'] !== $user['role']) {
         $_SESSION['name'] = $user['name'];

@@ -112,7 +112,7 @@ class RunCronJobsCommand extends Command
 
   public function getLastRunTimestamp($jobName)
   {
-    $result = Database::find('jobStatusModel', $jobName);
+    $result = Database::find('JobStatusModel', $jobName);
 
     if (!$result) {
       $this->createJobStatusEntry($jobName);
@@ -125,12 +125,12 @@ class RunCronJobsCommand extends Command
   private function createJobStatusEntry($jobName)
   {
     $initialTimestamp = '1970-01-01 00:00:00';
-    Database::insert('jobStatusModel', ['job_name' => $jobName, 'last_run' => $initialTimestamp]);
+    Database::insert('JobStatusModel', ['job_name' => $jobName, 'last_run' => $initialTimestamp]);
   }
 
   public function updateLastRunTimestamp($jobName)
   {
     $timestamp = date('Y-m-d H:i:s', time());
-    Database::update('jobStatusModel', $jobName, ['last_run' => $timestamp]);
+    Database::update('JobStatusModel', $jobName, ['last_run' => $timestamp]);
   }
 }

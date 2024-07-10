@@ -10,7 +10,7 @@ class Insert
 
   public static function handle($model, $attributes, $conflictColumns = [], $updateFields = [])
   {
-    $instance = self::getModelInstance($model);
+    $instance = Database::getModelInstance($model);
     $fillable = $instance->fillable;
 
     $nonFillableFields = array_diff_key($attributes, array_flip($fillable));
