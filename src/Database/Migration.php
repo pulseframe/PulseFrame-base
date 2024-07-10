@@ -14,9 +14,6 @@ abstract class Migration
 
   public function createTable(array $columns)
   {
-    $dropSql = "DROP TABLE IF EXISTS \"{$this->table}\"";
-    Database::execute($this->connection, $dropSql);
-
     $columnsSql = [];
     foreach ($columns as $name => $type) {
       if (strpos($type, 'INT AUTO_INCREMENT') !== false) {
@@ -27,12 +24,18 @@ abstract class Migration
     }
     $columnsString = implode(", ", $columnsSql);
     $sql = "CREATE TABLE IF NOT EXISTS \"{$this->table}\" ({$columnsString})";
-    Database::execute($this->connection, $sql);
+
+    Database::Execute('default', $sql);
+
+    //Database::Execute()
+    //  ->connection($this->connection)
+    //  ->sql($sql)
+    //  ->execute();
   }
 
   public function dropTable()
   {
     $sql = "DROP TABLE IF EXISTS \"{$this->table}\"";
-    Database::execute($this->connection, $sql);
+    Database::Execute($this->connection, $sql);
   }
 }

@@ -2,7 +2,7 @@
 
 namespace PulseFrame\Facades;
 
-use PulseFrame\Handlers\RouteHandler;
+use PulseFrame\Http\Handlers\RouteHandler;
 
 /**
  * Class Route

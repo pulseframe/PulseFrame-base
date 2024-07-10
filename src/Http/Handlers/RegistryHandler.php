@@ -1,6 +1,6 @@
 <?php
 
-namespace PulseFrame\Handlers;
+namespace PulseFrame\Http\Handlers;
 
 use PulseFrame\Facades\Config;
 

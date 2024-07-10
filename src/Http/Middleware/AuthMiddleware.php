@@ -1,12 +1,12 @@
 <?php
 
-namespace PulseFrame\middleware;
+namespace PulseFrame\Http\Middleware;
 
 use PulseFrame\Facades\Database;
 use Closure;
 use Illuminate\Http\Request;
 
-class authMiddleware
+class AuthMiddleware
 {
   public function handle(Request $request, Closure $next)
   {

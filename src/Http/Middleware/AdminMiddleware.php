@@ -1,12 +1,12 @@
 <?php
 
-namespace PulseFrame\middleware;
+namespace PulseFrame\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-class adminMiddleware
+class AdminMiddleware
 {
   public function handle(Request $request, Closure $next)
   {

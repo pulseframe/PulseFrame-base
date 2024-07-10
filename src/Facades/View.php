@@ -91,12 +91,12 @@ class View
     $data['isDev'] = $isDev;
 
     if ($template === 'error.twig') {
-      $data['debug'] = Env::get("settings.debug");
+      $data['debug'] = Env::get("app.settings.debug");
     }
 
     if ($isDev && !self::isViteServerRunning()) {
       $message = "Development server not detected.";
-      if (Env::get("settings.debug")) {
+      if (Env::get("app.settings.debug")) {
         $message .= "<br>Hint: Make sure the Vite dev server is running.<br>If this is a mistake, delete the <code>storage/hot</code> file.";
       }
       return self::$twig->render('error.twig', ['status' => "500", 'message' => $message]);
@@ -106,7 +106,7 @@ class View
       return $response->getContent();
     } else {
       $message = "Manifest file not found";
-      if (Env::get("settings.debug")) {
+      if (Env::get("app.settings.debug")) {
         $message .= "<br>Hint: Make sure you have built the project.<br>Not sure? Run <code>npx vite build</code>.";
       }
       return self::$twig->render('error.twig', ['status' => "500", 'message' => $message]);

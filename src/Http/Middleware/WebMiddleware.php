@@ -1,12 +1,12 @@
 <?php
 
-namespace PulseFrame\middleware;
+namespace PulseFrame\Http\Middleware;
 
 use PulseFrame\Facades\View;
 use Closure;
 use Illuminate\Http\Request;
 
-class webMiddleware
+class WebMiddleware
 {
   public function handle(Request $request, Closure $next)
   {

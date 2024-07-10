@@ -1,12 +1,12 @@
 <?php
 
-namespace PulseFrame\middleware;
+namespace PulseFrame\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
-class apiMiddleware
+class ApiMiddleware
 {
   public function handle(Request $request, Closure $next)
   {
