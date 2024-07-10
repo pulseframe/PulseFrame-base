@@ -123,14 +123,26 @@ class ExceptionHandler
    * Example usage:
    * errorHandler::renderErrorView(500, 'Internal Server Error');
    */
-  protected static function renderErrorView($statusCode, $message, $exception = null)
+  public static function renderErrorView($statusCode, $message, $exception = null)
   {
     while (ob_get_level()) {
       ob_end_clean();
     }
 
+    ob_start();
+
     try {
-      echo View::render('error.twig', ['status' => $statusCode, 'message' => $message, 'exception' => $exception]);
+      if (is_object($exception) || is_array($exception)) {
+        return;
+      } 
+
+      http_response_code($statusCode);
+
+      echo View::render('error.twig', [
+        'status' => $statusCode,
+        'message' => $message,
+        'exception' => $exception
+      ]);
     } catch (\Exception $renderException) {
       echo "An error occurred while rendering the error page.\n" . $renderException->getMessage();
     }

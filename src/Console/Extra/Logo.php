@@ -3,6 +3,7 @@
 namespace PulseFrame\Console\Extra;
 
 use PulseFrame\Facades\Config;
+use PulseFrame\Facades\Env;
 use PulseFrame\Foundation\Application as PulseApplication;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -18,8 +19,10 @@ class Logo
   | |__) |  _   _  | |  ___    ___  | |__     _ __    __ _   _ __ ___     ___ 
   |  ___/  | | | | | | / __|  / _ \ |  __|   | '__|  / _` | | '_ ` _ \   / _ \
   | |      | |_| | | | \__ \ |  __/ | |      | |    | (_| | | | | | | | |  __/
-  |_|       \__,_| |_| |___/  \___| |_|      |_|     \__,_| |_| |_| |_|  \___|" . $reset . " <info>v" . PulseApplication::$VERSION . "-" . Config::get('app', 'stage') . "<info>");
-    $output->writeln("");
+  |_|       \__,_| |_| |___/  \___| |_|      |_|     \__,_| |_| |_| |_|  \___|" . $reset . " <info>v" . PulseApplication::$VERSION . "-" . PulseApplication::$STAGE . "<info>");
+    $output->writeln('');
+    $output->writeln("<comment>Application:</comment> " . Env::get('app.name') . '-v' . Config::get('app', 'version') . "-" . Config::get('app', 'stage'));
+    $output->writeln('<comment>Is app in Development?</comment> ' . (Env::get('app.settings.debug') ? "Yes" : "No"));
+    $output->writeln('');
   }
 }
-

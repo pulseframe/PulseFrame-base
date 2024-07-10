@@ -4,6 +4,7 @@ namespace PulseFrame\Http\Handlers;
 
 use PulseFrame\Facades\View;
 use PulseFrame\Facades\Config;
+use PulseFrame\Http\Handlers\ExceptionHandler;
 use Illuminate\Routing\Router;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Http\Request;
@@ -198,46 +199,21 @@ class RouteHandler
       $response = $this->router->dispatch($request);
       $response->send();
     } catch (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e) {
-      $this->renderErrorView(404, 'The page you are looking for could not be found.');
+      ExceptionHandler::renderErrorView(404, 'The page you are looking for could not be found.');
     } catch (\Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException $e) {
-      $this->renderErrorView(405, 'The method you are using is not supported.');
+      ExceptionHandler::renderErrorView(405, 'The method you are using is not supported.');
     } catch (\Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException $e) {
-      $this->renderErrorView(403, 'Access denied.', $e);
+      ExceptionHandler::renderErrorView(403, 'Access denied.', $e);
     } catch (\Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException $e) {
-      $this->renderErrorView(401, 'Unauthorized access.', $e);
+      ExceptionHandler::renderErrorView(401, 'Unauthorized access.', $e);
     } catch (\Illuminate\Http\Exceptions\HttpResponseException $e) {
       $response = $e->getResponse();
       $response->send();
     } catch (\RuntimeException $e) {
-      $this->renderErrorView(500, 'A runtime error occurred.', $e);
+      ExceptionHandler::renderErrorView(500, 'A runtime error occurred.', $e);
     } catch (\Exception $e) {
-      $this->renderErrorView(500, 'An internal server error occurred.', $e);
+      ExceptionHandler::renderErrorView(500, 'An internal server error occurred.', $e);
     }
-  }
-
-  /**
-   * Render an error view.
-   *
-   * @category handlers
-   * 
-   * @param int $statusCode The HTTP status code.
-   * @param string $message The error message.
-   * @param \Exception|null $exception The exception instance (optional).
-   *
-   * This protected function renders an error view using the View facade. It also captures exceptions using Sentry.
-   * 
-   * Example usage:
-   * $this->renderErrorView(404, 'Page not found');
-   */
-  protected function renderErrorView($statusCode, $message, $exception = null)
-  {
-    if (isset($exception)) {
-      \Sentry\captureException($exception);
-    }
-
-    header("HTTP/1.1 $statusCode Internal Server Error");
-    echo View::render('error.twig', ['status' => $statusCode, 'message' => $message, 'exception' => $exception]);
-    exit;
   }
 
   /**

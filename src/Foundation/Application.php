@@ -7,6 +7,7 @@ use PulseFrame\Facades\Env;
 class Application
 {
   public static $VERSION = "1.1.0";
+  public static $STAGE = "BETA";
 
   private static $instance;
   private $singletons = [];

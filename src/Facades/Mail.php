@@ -3,6 +3,7 @@
 namespace PulseFrame\Facades;
 
 use PulseFrame\Facades\Env;
+use PulseFrame\facades\Config;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -92,7 +93,7 @@ class Mail
       $instance->mailer->clearAddresses();
       $instance->mailer->addAddress($to);
       $instance->mailer->isHTML(true);
-      $instance->mailer->Subject = $subject;
+      $instance->mailer->Subject = Config::get('app', 'stage') === 'development' ? "Development - " . $subject : $subject;
       $instance->mailer->Body    = $body;
 
       if ($altBody !== '' && $altBody !== false) {
@@ -109,8 +110,7 @@ class Mail
 
       return $instance->mailer->send();
     } catch (Exception $e) {
-      error_log('Mailer Error: ' . $instance->mailer->ErrorInfo);
-      return false;
+      throw new \Exception('Mailer Error: ' . $instance->mailer->ErrorInfo);
     }
   }
 }
