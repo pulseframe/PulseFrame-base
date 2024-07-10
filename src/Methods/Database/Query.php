@@ -3,6 +3,7 @@
 namespace PulseFrame\Methods\Database;
 
 use PulseFrame\Facades\Database;
+use PDO;
 
 class Query
 {

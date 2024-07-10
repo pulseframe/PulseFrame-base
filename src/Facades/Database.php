@@ -4,7 +4,6 @@ namespace PulseFrame\Facades;
 
 use PulseFrame\Models\Model as ModelAlias;
 use PDO;
-use PDOException;
 
 class Database
 {
@@ -36,7 +35,7 @@ class Database
       try {
         self::$conn = new PDO("$driver:host=$host;dbname=$database;port=$port", $username, $password);
         self::$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-      } catch (PDOException $e) {
+      } catch (\PDOException $e) {
         throw new \Exception("Connection failed: " . $e->getMessage());
       }
     }
