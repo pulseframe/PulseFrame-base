@@ -4,7 +4,7 @@ namespace PulseFrame\Facades;
 
 use PulseFrame\Facades\Config;
 use PulseFrame\Facades\Env;
-use PulseFrame\handlers\routeHandler;
+use PulseFrame\Http\Handlers\RouteHandler;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Loader\FilesystemLoader;
 use Twig\Environment;
@@ -157,7 +157,7 @@ class View
         'session' => $_SESSION,
         'settings' => Env::get('app.settings'),
         'page' => $template,
-        'routes' => routeHandler::$routeNames
+        'routes' => RouteHandler::$routeNames
       ], $data);
 
       try {
