@@ -10,8 +10,6 @@ class ApiMiddleware
 {
   public function handle(Request $request, Closure $next)
   {
-    session_start();
-
     $maxRequestsPerHour = 100;
 
     $clientId = $request->ip();
