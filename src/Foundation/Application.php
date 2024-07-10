@@ -21,7 +21,7 @@ class Application
     }
 
     self::$instance = $this;
-    define('ROOT_DIR', "/var/www/html/");
+    define('ROOT_DIR', __DIR__ . "/../../../../../");
 
     if (session_status() === PHP_SESSION_NONE) {
       session_start([
