@@ -146,6 +146,8 @@ class RouteHandler
    */
   public function loadRoutes()
   {
+    $this->loadRoutesFromFile(__DIR__ . '/../../InternalRoutes.php');
+
     $this->router->group(['middleware' => 'web'], function () {
       $this->loadRoutesFromFile(ROOT_DIR . '/routes/web.php');
     });
