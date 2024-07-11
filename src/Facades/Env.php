@@ -32,7 +32,7 @@ class Env
    * Example usage:
    * Env::load();
    */
-  public static function load()
+  public static function initialize()
   {
     if (file_exists(ROOT_DIR . '/config.yml')) {
       self::loadConfig();

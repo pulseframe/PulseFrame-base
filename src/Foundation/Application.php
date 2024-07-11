@@ -37,7 +37,7 @@ class Application
   }
 
   private function loadSingletons() {
-    $this->singleton([Env::class, 'load']);
+    $this->singleton([Env::class, 'initialize']);
   }
 
   public static function getInstance()

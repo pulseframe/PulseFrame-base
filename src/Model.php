@@ -1,6 +1,6 @@
 <?php
 
-namespace PulseFrame\Model;
+namespace PulseFrame;
 
 class Model
 {

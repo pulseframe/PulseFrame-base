@@ -42,7 +42,7 @@ class RunCronJobsCommand extends Command
 
     $specificJob = $input->getOption('job');
 
-    $jobFiles = glob(ROOT_DIR . '/app/jobs/*.php');
+    $jobFiles = glob(ROOT_DIR . '/app/Jobs/*.php');
     foreach ($jobFiles as $jobFile) {
       $className = $this->getClassNameFromFile($jobFile);
       if ($specificJob && basename($jobFile, '.php') !== $specificJob) {
@@ -64,7 +64,7 @@ class RunCronJobsCommand extends Command
   {
     require_once $filePath;
     $className = basename($filePath, '.php');
-    return 'App\\jobs\\' . $className;
+    return 'App\\Jobs\\' . $className;
   }
 
   private function generateLogFileName($logDir, $scriptName)
