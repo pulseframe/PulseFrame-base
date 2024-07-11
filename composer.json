@@ -1,6 +1,6 @@
 {
     "name": "pulseframe/base",
-    "description": "The new laravel replacement. Super lightweight, fast, easy to work with, and much more!",
+    "description": "PulseFrame's core functionality for php",
     "type": "library",
     "license": "MIT",
     "autoload": {
