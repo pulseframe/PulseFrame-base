@@ -4,6 +4,10 @@ namespace PulseFrame\Http\Handlers;
 
 use PulseFrame\Facades\View;
 use PulseFrame\Facades\Env;
+use PulseFrame\Facades\Log;
+use PulseFrame\Facades\Config;
+use PulseFrame\Facades\Response;
+use PulseFrame\Facades\Translation;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 /**
@@ -18,10 +22,13 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
  */
 class ExceptionHandler
 {
+  public static $ErrorCode = "";
 
   public static function initialize()
   {
     self::initializeSentry(Env::get('sentry_dsn'));
+
+    self::$ErrorCode = substr(strtoupper(base64_encode(random_bytes(6))), 0, 8);
 
     // Set the exception and error handlers
     set_exception_handler([self::class, 'handle']);
@@ -63,7 +70,13 @@ class ExceptionHandler
    */
   public static function handle(\Throwable $e)
   {
-    \Sentry\captureException($e);
+    \Sentry\withScope(function (\Sentry\State\Scope $scope) use ($e): void {
+      $scope->setTag('error_code', self::$ErrorCode);
+  
+      \Sentry\captureException($e);
+    });
+
+    Log::Exception($e);
 
     if ($e instanceof HttpExceptionInterface) {
       self::renderErrorView(
@@ -71,12 +84,8 @@ class ExceptionHandler
         $e->getMessage(),
         method_exists($e, 'getErrors') ? $e->getErrors() : null
       );
-    } elseif ($e instanceof \Exception) {
-      self::renderErrorView(500, 'An internal server error occurred.', $e->getMessage());
-    } elseif ($e instanceof \RuntimeException) {
-      self::renderErrorView(500, 'An internal server error occurred.', $e->getMessage());
     } else {
-      self::renderErrorView(500, 'An unexpected error occurred.', $e->getMessage());
+      self::renderErrorView(500, Translation::key('errors.error-1'), $e);
     }
   }
 
@@ -102,10 +111,11 @@ class ExceptionHandler
       return false;
     }
 
-    $exception = new \ErrorException($message, 0, $severity, $file, $line);
-    \Sentry\captureException($exception);
+    $e = new \ErrorException($message, 0, $severity, $file, $line);
+    \Sentry\captureException($e);
+    Log::Exception($e);
 
-    throw $exception;
+    throw $e;
   }
 
   /**
@@ -132,19 +142,29 @@ class ExceptionHandler
     ob_start();
 
     try {
-      if (is_object($exception) || is_array($exception)) {
-        return;
-      } 
-
       http_response_code($statusCode);
 
-      echo View::render('error.twig', [
-        'status' => $statusCode,
-        'message' => $message,
-        'exception' => $exception
-      ]);
-    } catch (\Exception $renderException) {
-      echo "An error occurred while rendering the error page.\n" . $renderException->getMessage();
+      if ($statusCode === 500) {
+        \Sentry\withScope(function (\Sentry\State\Scope $scope) use ($exception): void {
+          $scope->setTag('error_code', self::$ErrorCode);
+      
+          \Sentry\captureException($exception);
+        });
+      }
+
+      if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        echo View::render('error.twig', [
+          'status' => $statusCode,
+          'message' => $message,
+          'exception' => $exception->getMessage(),
+          'code' => self::$ErrorCode
+        ]);
+      } else {
+        $message = Config::get('app', 'stage') === "development" ? $exception->getMessage() : Translation::key('errors.error-0');
+        echo Response::JSON('error', $message, self::$ErrorCode);
+      }
+    } catch (\Exception $e) {
+      return "An error occurred while rendering the error page.\n" . $e->getMessage();
     }
 
     exit;

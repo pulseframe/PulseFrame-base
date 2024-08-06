@@ -3,13 +3,15 @@
 namespace PulseFrame\Foundation;
 
 use PulseFrame\Facades\Env;
+use PulseFrame\Facades\Database;
+use PulseFrame\Database\Models\PulseFrameModel;
 
 class Application
 {
-  public static $VERSION = "1.1.0";
+  public static $VERSION = "1.2.0";
   public static $STAGE = "BETA";
 
-  private static $instance;
+  public static $instance;
   private $singletons = [];
   private $facadeInstances = [];
 
@@ -20,6 +22,8 @@ class Application
     if (self::$instance) {
       throw new \RuntimeException('An instance of the Application class already exists.');
     }
+
+    self::$initialized = true;
 
     self::$instance = $this;
     define('ROOT_DIR', __DIR__ . "/../../../../../");
@@ -34,9 +38,28 @@ class Application
     }
 
     $this->loadSingletons();
+
+    if (empty(Env::get('app.key'))) {
+      throw new \Exception("It seems there is no app key... You may have forgotten to generate it.");
+    }
+    try {
+      $existingData = Database::All(PulseFrameModel::class, ['data' => json_encode(["CreatePulseFrame" => true])]);
+      if ($existingData) {
+        $data = Database::All(PulseFrameModel::class, ['id' => '328ef6b3-68d0-4f47-9ffe-7529d5d392b3']);
+        $data = json_decode($data[0]['data'], true);
+        if ($data['key'] !== Env::get('app.key')) {
+          $PulseFrame = Database::find(PulseFrameModel::class, Env::get('app.key'));
+          if (empty($PulseFrame)) {
+            throw new \Exception("Uh oh! There seems to be a key mismatch, you must have changed your key!");
+          }
+        }
+      }
+    } catch (\Exception $e) {
+    }
   }
 
-  private function loadSingletons() {
+  private function loadSingletons()
+  {
     $this->singleton([Env::class, 'initialize']);
   }
 
@@ -50,21 +73,21 @@ class Application
 
   public function singleton(callable $callable)
   {
-    if (self::$instance !== null) {
-      self::getInstance();
-      self::$initialized = true;
-    }
-
     $callableKey = $this->getCallableKey($callable);
 
-    if (isset($this->singletons[$callableKey])) {
+    if (!isset($this->singletons[$callableKey])) {
+      $this->singletons[$callableKey] = [];
+    }
+
+    $this->singletons[$callableKey][] = $callable;
+
+    if (count($this->singletons[$callableKey]) > 1) {
       throw new \RuntimeException("The callable $callableKey is already initialized.");
     }
 
-    $this->singletons[$callableKey] = call_user_func($callable);
-    return $this->singletons[$callableKey];
+    return call_user_func($callable);
   }
-  
+
   private function getCallableKey(callable $callable): string
   {
     if (is_string($callable)) {

@@ -22,7 +22,7 @@ class Logo
   |_|       \__,_| |_| |___/  \___| |_|      |_|     \__,_| |_| |_| |_|  \___|" . $reset . " <info>v" . PulseApplication::$VERSION . "-" . PulseApplication::$STAGE . "<info>");
     $output->writeln('');
     $output->writeln("<comment>Application:</comment> " . Env::get('app.name') . '-v' . Config::get('app', 'version') . "-" . Config::get('app', 'stage'));
-    $output->writeln('<comment>Is app in Development?</comment> ' . (Env::get('app.settings.debug') ? "Yes" : "No"));
+    $output->writeln('<comment>Is app in debug?</comment> ' . (Env::get('app.settings.debug') ? "Yes" : "No"));
     $output->writeln('');
   }
 }

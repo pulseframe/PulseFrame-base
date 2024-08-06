@@ -5,6 +5,8 @@ namespace PulseFrame\Http\Middleware;
 use PulseFrame\Facades\View;
 use Closure;
 use Illuminate\Http\Request;
+use PulseFrame\Facades\Response;
+use PulseFrame\Facades\Request As PulseRequest;
 
 class WebMiddleware
 {
@@ -27,8 +29,12 @@ class WebMiddleware
     $currentUrl = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
     if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
       if ($currentUrl === '/account/register' || $currentUrl === '/account/login') {
-        header('Location: /');
-        exit();
+        $redirect = PulseRequest::Query('redirect_to');
+        if ($redirect) {
+          return Response::Redirect($redirect);
+        } else {
+          return Response::Redirect("home");
+        }
       }
       return $next($request);
     }

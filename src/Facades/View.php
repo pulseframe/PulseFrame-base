@@ -41,7 +41,10 @@ class View
       self::initialize();
     }
 
-    $this->manifest = json_decode(file_get_contents(ROOT_DIR . '/public/assets/.vite/manifest.json'), true);
+    $manifestPath = ROOT_DIR . '/public/assets/.vite/manifest.json';
+    if (file_exists($manifestPath)) {
+      $this->manifest = json_decode(file_get_contents($manifestPath), true);
+    }
   }
 
   /**
@@ -80,11 +83,12 @@ class View
    */
   public static function render($template, $data = [])
   {
+    $manifest = (new self())->manifest;
+
     if (!self::$twig) {
       self::initialize();
     }
 
-    $manifestPath = ROOT_DIR . '/public/assets/.vite/manifest.json';
     $hotFile = $_ENV['storage_path'] . '/hot';
     $isDev = file_exists($hotFile);
 
@@ -100,16 +104,16 @@ class View
         $message .= "<br>Hint: Make sure the Vite dev server is running.<br>If this is a mistake, delete the <code>storage/hot</code> file.";
       }
       return self::$twig->render('error.twig', ['status' => "500", 'message' => $message]);
-    } elseif (file_exists($manifestPath) || ($isDev && self::isViteServerRunning())) {
-      $view = new self();
-      $response = $view->renderView($template, $data);
-      return $response->getContent();
-    } else {
+    } elseif (!$isDev && (!isset($manifest) || empty($manifest))) {
       $message = "Manifest file not found";
       if (Env::get("app.settings.debug")) {
         $message .= "<br>Hint: Make sure you have built the project.<br>Not sure? Run <code>npx vite build</code>.";
       }
       return self::$twig->render('error.twig', ['status' => "500", 'message' => $message]);
+    } else {
+      $view = new self();
+      $response = $view->renderView($template, $data);
+      return $response->getContent();
     }
   }
 
@@ -150,8 +154,10 @@ class View
    */
   private function renderView(string $template, array $data = []): Response
   {
-    if (substr($template, -4) === '.vue') {
-      $template = str_replace('.vue', '', $template);
+    $extension = substr($template, -4);
+
+    if (in_array($extension, ['.vue', '.ts', '.tsx'])) {
+      $template = str_replace($extension, '', $template);
 
       $data['app'] = array_merge([
         'session' => $_SESSION,
@@ -160,16 +166,18 @@ class View
         'routes' => RouteHandler::$routeNames
       ], $data);
 
-      try {
-        $data['assets'] = $this->resolveAssets(Config::get('app', 'entry'));
-      } catch (Exception $e) {
-        return new Response(
-          self::$twig->render('error.twig', [
-            'status' => 500,
-            'message' => $e->getMessage(),
-          ]),
-          Response::HTTP_INTERNAL_SERVER_ERROR
-        );
+      if (!$data['isDev']) {
+        try {
+          $data['assets'] = $this->resolveAssets(Config::get('app', 'entry'));
+        } catch (Exception $e) {
+          return new Response(
+            self::$twig->render('error.twig', [
+              'status' => 500,
+              'message' => $e->getMessage(),
+            ]),
+            Response::HTTP_INTERNAL_SERVER_ERROR
+          );
+        }
       }
 
       if (isset($_SESSION['password'])) {

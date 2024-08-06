@@ -2,6 +2,7 @@
 
 namespace PulseFrame\Console\Commands;
 
+use PulseFrame\Facades\Env;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -28,7 +29,8 @@ class MaintenanceToggleCommand extends Command
       touch($maintenanceFile);
       $uuid = $this->uuidv4();
       file_put_contents($maintenanceFile, $uuid);
-      $output->writeln('<info>Maintenance mode enabled with UUID: ' . $uuid . '</info>');
+      $output->writeln('<info>To activate the maintenance bypass: ' . Env::get("app.url") . "/activate/" . $uuid . '</info>');
+      $output->writeln('<info>Maintenance mode enabled</info>');
     }
 
     return Command::SUCCESS;

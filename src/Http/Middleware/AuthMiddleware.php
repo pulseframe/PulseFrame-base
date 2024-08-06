@@ -2,6 +2,7 @@
 
 namespace PulseFrame\Http\Middleware;
 
+use PulseFrame\Facades\Response;
 use PulseFrame\Facades\Database;
 use Closure;
 use Illuminate\Http\Request;
@@ -12,7 +13,6 @@ class AuthMiddleware
   {
     if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
       $user = Database::find("UsersModel", $_SESSION['email']);
-
       if ($user === false || $_SESSION['name'] !== $user['name'] || $_SESSION['email'] !== $user['email'] || $_SESSION['role'] !== $user['role']) {
         $_SESSION['name'] = $user['name'];
         $_SESSION['email'] = $user['email'];
@@ -25,10 +25,11 @@ class AuthMiddleware
 
       return $next($request);
     } else {
-      header("Location: /account/login");
-      exit;
+      $currentUrl = urlencode($_SERVER['REQUEST_URI']);
+      return Response::Redirect("/account/login?redirect_to=$currentUrl");
     }
   }
+
   private function logout()
   {
     $_SESSION = array();
@@ -45,7 +46,7 @@ class AuthMiddleware
       );
     }
     session_destroy();
-    header("Location: /account/login");
-    exit;
+    $currentUrl = urlencode($_SERVER['REQUEST_URI']);
+    return Response::Redirect("/account/login?redirect_to=$currentUrl");
   }
 }

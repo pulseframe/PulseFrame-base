@@ -4,6 +4,7 @@ namespace PulseFrame\Http\Handlers;
 
 use PulseFrame\Facades\View;
 use PulseFrame\Facades\Config;
+use PulseFrame\Facades\Log;
 use PulseFrame\Http\Handlers\ExceptionHandler;
 use Illuminate\Routing\Router;
 use Illuminate\Events\Dispatcher;
@@ -56,11 +57,11 @@ class RouteHandler
    */
   public static function getInstance()
   {
-    if (null === static::$instance) {
-      static::$instance = new static();
+    if (null === self::$instance) {
+      self::$instance = new self();
     }
 
-    return static::$instance;
+    return self::$instance;
   }
 
   /**
@@ -118,8 +119,6 @@ class RouteHandler
     $routes = include_once $filePath;
 
     $routeData = [];
-
-    $routes($this->router);
 
     $routeCollection = $this->router->getRoutes();
 
@@ -210,8 +209,10 @@ class RouteHandler
       $response = $e->getResponse();
       $response->send();
     } catch (\RuntimeException $e) {
+      Log::Exception($e);
       ExceptionHandler::renderErrorView(500, 'A runtime error occurred.', $e);
     } catch (\Exception $e) {
+      Log::Exception($e);
       ExceptionHandler::renderErrorView(500, 'An internal server error occurred.', $e);
     }
   }
@@ -232,7 +233,23 @@ class RouteHandler
    */
   public function __call($method, $arguments)
   {
+    if (isset($arguments[1]) && is_string($arguments[1]) && strpos($arguments[1], '@') !== false) {
+      $arguments[1] = $this->resolveControllerAction($arguments[1]);
+    }
+
     return call_user_func_array([$this->router, $method], $arguments);
+  }
+
+  public function resolveControllerAction($action)
+  {
+    if (strpos($action, '@') !== false) {
+      list($controller, $method) = explode('@', $action);
+      $controller = '\\App\\Http\\Controllers\\' . $controller;
+      if (class_exists($controller)) {
+        return [$controller, $method];
+      }
+    }
+    return false;
   }
 
   /**
