@@ -3,10 +3,9 @@
 namespace PulseFrame\Http\Middleware;
 
 use PulseFrame\Facades\View;
-use Closure;
-use Illuminate\Http\Request;
 use PulseFrame\Facades\Response;
-use PulseFrame\Facades\Request As PulseRequest;
+use PulseFrame\Facades\Request;
+use Closure;
 
 class WebMiddleware
 {
@@ -17,10 +16,10 @@ class WebMiddleware
     if (file_exists($maintenanceFile)) {
       if (isset($_SESSION['maintenanceUUID'])) {
         $fileUUID = trim(file_get_contents($maintenanceFile));
-          if ($_SESSION['maintenanceUUID'] === $fileUUID) {
-          } else {
-            return View::render('maintenance.twig');
-          }
+        if ($_SESSION['maintenanceUUID'] === $fileUUID) {
+        } else {
+          return View::render('maintenance.twig');
+        }
       } else {
         return View::render('maintenance.twig');
       }
@@ -29,7 +28,7 @@ class WebMiddleware
     $currentUrl = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
     if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
       if ($currentUrl === '/account/register' || $currentUrl === '/account/login') {
-        $redirect = PulseRequest::Query('redirect_to');
+        $redirect = Request::Query('redirect_to');
         if ($redirect) {
           return Response::Redirect($redirect);
         } else {

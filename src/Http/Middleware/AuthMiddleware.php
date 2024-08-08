@@ -4,8 +4,8 @@ namespace PulseFrame\Http\Middleware;
 
 use PulseFrame\Facades\Response;
 use PulseFrame\Facades\Database;
+use PulseFrame\Facades\Request;
 use Closure;
-use Illuminate\Http\Request;
 
 class AuthMiddleware
 {

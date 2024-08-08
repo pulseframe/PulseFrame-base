@@ -2,9 +2,9 @@
 
 namespace PulseFrame\Http\Middleware;
 
+use PulseFrame\Facades\Request;
+use PulseFrame\Facades\Response;
 use Closure;
-use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
 
 class ApiMiddleware
 {
@@ -33,7 +33,7 @@ class ApiMiddleware
     $_SESSION[$key] = $rateLimitData;
 
     if ($rateLimitData['requests'] > $maxRequestsPerHour) {
-      return new JsonResponse(['error' => 'Rate limit exceeded.'], 429);
+      return Response::JSON('error', 'Rate limit exceeded.');
     }
 
     return $next($request);

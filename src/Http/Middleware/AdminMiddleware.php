@@ -2,9 +2,9 @@
 
 namespace PulseFrame\Http\Middleware;
 
-use Closure;
-use Illuminate\Http\Request;
+use PulseFrame\Facades\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Closure;
 
 class AdminMiddleware
 {
