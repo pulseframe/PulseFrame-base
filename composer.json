@@ -16,8 +16,6 @@
     "minimum-stability": "stable",
     "require": {
         "twig/twig": "^3.10",
-        "illuminate/routing": "^11.7",
-        "illuminate/events": "^11.7",
         "symfony/console": "^7.1",
         "symfony/yaml": "^7.0",
         "vlucas/phpdotenv": "^5.6",
