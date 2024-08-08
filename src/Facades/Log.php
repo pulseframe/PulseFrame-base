@@ -18,11 +18,11 @@ class Log
       self::$logger = new Logger(Env::get("app.name"));
 
       $handler = new StreamHandler($logFilePath, Logger::ERROR);
-            
+
       $formatter = new LineFormatter("%datetime% %channel%.%level_name%: %message%\n%context% %extra%\n", "Y-m-d H:i:s", true, true);
       $formatter->includeStacktraces(true);
       $handler->setFormatter($formatter);
-      
+
       self::$logger->pushHandler($handler);
     }
 
@@ -48,7 +48,7 @@ class Log
     self::getLogger()->error("$message\n$formattedContext");
   }
 
-  public static function Exception(\Exception $e)
+  public static function Exception(\Throwable $e)
   {
     $context = [
       'Exception' => $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine(),
