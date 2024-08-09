@@ -2,14 +2,13 @@
 
 namespace PulseFrame\Http\Middleware;
 
+use PulseFrame\Middleware;
 use PulseFrame\Facades\Response;
 use PulseFrame\Facades\Database;
-use PulseFrame\Facades\Request;
-use Closure;
 
-class AuthMiddleware
+class AuthMiddleware extends Middleware
 {
-  public function handle(Request $request, Closure $next)
+  public function handle($request, $next)
   {
     if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
       $user = Database::find("UsersModel", $_SESSION['email']);

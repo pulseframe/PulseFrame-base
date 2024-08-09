@@ -2,18 +2,17 @@
 
 namespace PulseFrame\Http\Middleware;
 
-use PulseFrame\Facades\Request;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Closure;
+use PulseFrame\Middleware;
+use PulseFrame\Exceptions\AccessForbiddenException;
 
-class AdminMiddleware
+class AdminMiddleware extends Middleware
 {
-  public function handle(Request $request, Closure $next)
+  public function handle($request, $next)
   {
     if ($_SESSION['role'] === 'admin') {
       return $next($request);
     } else {
-      throw new AccessDeniedHttpException('Forbidden');
+      throw new AccessForbiddenException("You are not authorized to access this resource.");
     }
   }
 }

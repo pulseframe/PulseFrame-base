@@ -2,14 +2,14 @@
 
 namespace PulseFrame\Http\Middleware;
 
+use PulseFrame\Middleware;
 use PulseFrame\Facades\View;
 use PulseFrame\Facades\Response;
 use PulseFrame\Facades\Request;
-use Closure;
 
-class WebMiddleware
+class WebMiddleware extends Middleware
 {
-  public function handle(Request $request, Closure $next)
+  public function handle($request, $next)
   {
     $maintenanceFile = $_ENV['storage_path'] . '/framework/maintenance.flag';
 

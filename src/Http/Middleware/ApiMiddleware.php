@@ -2,13 +2,12 @@
 
 namespace PulseFrame\Http\Middleware;
 
-use PulseFrame\Facades\Request;
+use PulseFrame\Middleware;
 use PulseFrame\Facades\Response;
-use Closure;
 
-class ApiMiddleware
+class ApiMiddleware extends Middleware
 {
-  public function handle(Request $request, Closure $next)
+  public function handle($request, $next)
   {
     $maxRequestsPerHour = 100;
 
@@ -33,7 +32,9 @@ class ApiMiddleware
     $_SESSION[$key] = $rateLimitData;
 
     if ($rateLimitData['requests'] > $maxRequestsPerHour) {
-      return Response::JSON('error', 'Rate limit exceeded.');
+      http_response_code(429);
+      echo Response::JSON('error', 'Rate limit exceeded.');
+      exit;
     }
 
     return $next($request);
