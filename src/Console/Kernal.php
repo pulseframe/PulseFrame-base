@@ -2,9 +2,7 @@
 
 namespace PulseFrame\Console;
 
-use PulseFrame\Facades\Config;
 use PulseFrame\Console\Extra\Logo;
-use PulseFrame\Foundation\Application as PulseApplication;
 use App\Console\Kernal as AppConsoleKernal;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Finder\Finder;
@@ -14,7 +12,8 @@ class Kernal
 {
   public static $application;
 
-  public static function initialize() {
+  public static function initialize()
+  {
     $instance = new self();
     return $instance->initializeInstance();
   }
@@ -24,7 +23,7 @@ class Kernal
     $application = new Application('');
 
     self::$application = $application;
-    
+
     $this->loadCommands();
 
     new AppConsoleKernal(self::$application);
@@ -36,7 +35,7 @@ class Kernal
   {
     $output = new ConsoleOutput();
     new Logo($output);
-    
+
     $finder = new Finder();
     $finder->files()->in(__DIR__ . '/Commands')->name('*Command.php');
 

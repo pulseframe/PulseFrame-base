@@ -8,8 +8,8 @@ use PulseFrame\Database\Models\PulseFrameModel;
 
 class Application
 {
-  public static $VERSION = "1.2.0";
-  public static $STAGE = "BETA";
+  public const VERSION = "1.2";
+  public const STAGE = "BETA";
 
   public static $instance;
   private $singletons = [];
