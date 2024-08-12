@@ -6,7 +6,7 @@ use PulseFrame\Facades\Config;
 use PulseFrame\Facades\Env;
 use PulseFrame\Http\Handlers\RouteHandler;
 use PulseFrame\Facades\Response;
-use PulseFrame\Support\Engine;
+use PulseFrame\Support\Template\Engine;
 
 /**
  * Class View
