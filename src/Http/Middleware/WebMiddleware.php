@@ -18,10 +18,10 @@ class WebMiddleware extends Middleware
         $fileUUID = trim(file_get_contents($maintenanceFile));
         if ($_SESSION['maintenanceUUID'] === $fileUUID) {
         } else {
-          return View::render('maintenance.twig');
+          return View::render('maintenance');
         }
       } else {
-        return View::render('maintenance.twig');
+        return View::render('maintenance');
       }
     }
 

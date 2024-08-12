@@ -58,7 +58,7 @@ class View
    * server is running and renders appropriate error messages if required assets are missing.
    * 
    * Example usage:
-   * $html = View::render('template.twig', ['key' => 'value']);
+   * $html = View::render('template', ['key' => 'value']);
    */
   public static function render($template, $data = [])
   {
@@ -74,7 +74,7 @@ class View
 
     $data['isDev'] = $isDev;
 
-    if ($template === 'error.twig') {
+    if ($template === 'error') {
       $data['debug'] = Env::get("app.settings.debug");
     }
 
@@ -83,13 +83,13 @@ class View
       if (Env::get("app.settings.debug")) {
         $message .= "<br>Hint: Make sure the Vite dev server is running.<br>If this is a mistake, delete the <code>storage/hot</code> file.";
       }
-      return self::$view->render('error.twig', ['status' => Response::HTTP_INTERNAL_SERVER_ERROR, 'message' => $message]);
+      return self::$view->render('error', ['status' => Response::HTTP_INTERNAL_SERVER_ERROR, 'message' => $message]);
     } elseif (!$isDev && (!isset($manifest) || empty($manifest))) {
       $message = "Manifest file not found";
       if (Env::get("app.settings.debug")) {
         $message .= "<br>Hint: Make sure you have built the project.<br>Not sure? Run <code>npx vite build</code>.";
       }
-      return self::$view->render('error.twig', ['status' => Response::HTTP_INTERNAL_SERVER_ERROR, 'message' => $message]);
+      return self::$view->render('error', ['status' => Response::HTTP_INTERNAL_SERVER_ERROR, 'message' => $message]);
     } else {
       $view = new self();
       $response = $view->renderView($template, $data);
@@ -159,7 +159,7 @@ class View
         unset($_SESSION['password']);
       }
 
-      $template = 'base.twig';
+      $template = 'base';
 
       try {
         $assets = $this->resolveAssets(Config::get('app', 'entry'));
@@ -171,11 +171,11 @@ class View
           }
         );
 
-        $assetsTemplate = self::$view->render('assets.twig', ['assets' => $assets]);
+        $assetsTemplate = self::$view->render('assets', ['assets' => $assets]);
 
         $data['assets'] = $assetsTemplate;
       } catch (\Exception $e) {
-        return self::$view->render('error.twig', [
+        return self::$view->render('error', [
           'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
           'message' => $e->getMessage(),
         ]);
