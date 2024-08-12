@@ -15,7 +15,6 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "twig/twig": "^3.10",
         "monolog/monolog": "^3.7",
         "symfony/console": "^7.1",
         "symfony/yaml": "^7.0",
