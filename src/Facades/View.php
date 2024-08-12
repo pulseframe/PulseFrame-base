@@ -36,10 +36,7 @@ class View
   public function __construct()
   {
     if (!self::$view) {
-      self::$view = new Engine([
-        __DIR__ . '/../views/',
-        Config::get('view')['twig']['path'],
-      ]);
+      self::$view = new Engine();
     }
 
     $manifestPath = ROOT_DIR . '/public/assets/.vite/manifest.json';
