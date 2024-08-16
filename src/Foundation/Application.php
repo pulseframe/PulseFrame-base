@@ -4,6 +4,7 @@ namespace PulseFrame\Foundation;
 
 use PulseFrame\Facades\Env;
 use PulseFrame\Facades\Database;
+use PulseFrame\Facades\Session;
 use PulseFrame\Database\Models\PulseFrameModel;
 
 class Application
@@ -13,7 +14,6 @@ class Application
 
   public static $instance;
   private $singletons = [];
-  private $facadeInstances = [];
 
   public static $initialized;
 
@@ -28,14 +28,7 @@ class Application
     self::$instance = $this;
     define('ROOT_DIR', __DIR__ . "/../../../../../");
 
-    if (session_status() === PHP_SESSION_NONE) {
-      session_start([
-        'cookie_lifetime' => 86400,
-        'cookie_secure' => isset($_SERVER['HTTPS']),
-        'cookie_httponly' => true,
-        'use_strict_mode' => true
-      ]);
-    }
+    Session::start();
 
     $this->loadSingletons();
 

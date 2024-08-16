@@ -3,6 +3,7 @@
 namespace PulseFrame\Http\Middleware;
 
 use PulseFrame\Middleware;
+use PulseFrame\Facades\Session;
 use PulseFrame\Facades\Response;
 
 class ApiMiddleware extends Middleware
@@ -15,7 +16,7 @@ class ApiMiddleware extends Middleware
 
     $key = "rate_limit:$clientId";
 
-    $rateLimitData = isset($_SESSION[$key]) ? $_SESSION[$key] : [
+    $rateLimitData = Session::get($key) !== null ? Session::get($key) : [
       'requests' => 0,
       'start_time' => time(),
     ];
@@ -29,7 +30,7 @@ class ApiMiddleware extends Middleware
 
     $rateLimitData['requests']++;
 
-    $_SESSION[$key] = $rateLimitData;
+    Session::set($key, $rateLimitData);
 
     if ($rateLimitData['requests'] > $maxRequestsPerHour) {
       http_response_code(429);

@@ -2,15 +2,18 @@
 
 namespace PulseFrame\Http\Controllers;
 
-class MaintenanceController {
+use PulseFrame\Facades\Cookie;
+
+class MaintenanceController
+{
   public function index($uuid)
   {
     if (file_exists($_ENV['storage_path'] . '/framework/maintenance.flag')) {
       if (!preg_match('/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i', $uuid)) {
         return json_encode(["status" => "error", "message" => 'Invalid UUID format: ' . $uuid]);
-      }    
-  
-      $_SESSION['maintenanceUUID'] = $uuid;
+      }
+
+      Cookie::set('maintenanceUUID', $uuid, time() + 3600);
 
       echo "<script>
         setTimeout(function() {

@@ -20,6 +20,7 @@ use PulseFrame\Support\Template\Engine;
 class View
 {
   public static $view;
+  public static $errorPage;
   private $manifest;
 
   /**
@@ -39,7 +40,16 @@ class View
       self::$view = new Engine();
     }
 
+    try {
+      $errorPage = Config::get('view', 'error_page');
+    } catch (\Exception $e) {
+      $errorPage = 'error';
+    }
+
+    self::$errorPage = $errorPage;
+
     $manifestPath = ROOT_DIR . '/public/assets/.vite/manifest.json';
+
     if (file_exists($manifestPath)) {
       $this->manifest = json_decode(file_get_contents($manifestPath), true);
     }
@@ -60,7 +70,7 @@ class View
    * Example usage:
    * $html = View::render('template', ['key' => 'value']);
    */
-  public static function render($template, $data = [])
+  public static function render($template, $data = [], $includeExtension = true)
   {
     $manifest = (new self())->manifest;
 
@@ -74,7 +84,7 @@ class View
 
     $data['isDev'] = $isDev;
 
-    if ($template === 'error') {
+    if (Env::get("app.settings.debug")) {
       $data['debug'] = Env::get("app.settings.debug");
     }
 
@@ -83,16 +93,16 @@ class View
       if (Env::get("app.settings.debug")) {
         $message .= "<br>Hint: Make sure the Vite dev server is running.<br>If this is a mistake, delete the <code>storage/hot</code> file.";
       }
-      return self::$view->render('error', ['status' => Response::HTTP_INTERNAL_SERVER_ERROR, 'message' => $message]);
+      return self::$view->render(self::$errorPage, ['status' => Response::HTTP_INTERNAL_SERVER_ERROR, 'message' => $message]);
     } elseif (!$isDev && (!isset($manifest) || empty($manifest))) {
       $message = "Manifest file not found";
       if (Env::get("app.settings.debug")) {
         $message .= "<br>Hint: Make sure you have built the project.<br>Not sure? Run <code>npx vite build</code>.";
       }
-      return self::$view->render('error', ['status' => Response::HTTP_INTERNAL_SERVER_ERROR, 'message' => $message]);
+      return self::$view->render(self::$errorPage, ['status' => Response::HTTP_INTERNAL_SERVER_ERROR, 'message' => $message]);
     } else {
       $view = new self();
-      $response = $view->renderView($template, $data);
+      $response = $view->renderView($template, $data, $includeExtension);
       return $response->getContent();
     }
   }
@@ -141,7 +151,7 @@ class View
    * Example usage:
    * $response = $view->renderView('template.vue', ['key' => 'value']);
    */
-  private function renderView(string $template, array $data = []): Response
+  private function renderView(string $template, array $data = [], $includeExtension = true): Response
   {
     $extension = substr($template, -4);
 
@@ -162,7 +172,7 @@ class View
       $template = 'base';
 
       try {
-        $assets = $this->resolveAssets(Config::get('app', 'entry'));
+        $assets = $this->resolveAssets(Config::get('view', 'entry'));
 
         self::$view->addFunction(
           'assetUrl',
@@ -175,14 +185,14 @@ class View
 
         $data['assets'] = $assetsTemplate;
       } catch (\Exception $e) {
-        return self::$view->render('error', [
+        return self::$view->render(self::$errorPage, [
           'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
           'message' => $e->getMessage(),
         ]);
       }
     }
 
-    return new Response(self::$view->render($template, $data));
+    return new Response(self::$view->render($template, $data, $includeExtension));
   }
 
   /**

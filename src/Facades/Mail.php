@@ -76,7 +76,7 @@ class Mail
    * @param string $subject The email subject.
    * @param string $body The HTML content of the email.
    * @param string $altBody The plain text alternative content of the email (optional).
-   * @param array $attachments An array of file paths to attach to the email (optional).
+   * @param array $attachments An array of file paths or associative arrays of file paths and names to attach to the email (optional).
    * @return bool True on success, False on failure.
    *
    * This static function sends an email using the PHPMailer instance. It sets the recipient, subject, HTML and 
@@ -86,31 +86,37 @@ class Mail
    * Example usage:
    * $result = Mail::send('recipient@example.com', 'Subject', '<b>HTML content</b>', 'Plain text content', ['/path/to/file1', '/path/to/file2']);
    */
-  public static function send($to, $subject, $body, $altBody = '', $attachments = [])
+  public static function send($to, string $subject, $body, $altBody = '', $attachments = [])
   {
+    $instance = self::getInstance();
+
     try {
-      $instance = self::getInstance();
       $instance->mailer->clearAddresses();
+      $instance->mailer->clearAttachments();
+
       $instance->mailer->addAddress($to);
+
       $instance->mailer->isHTML(true);
       $instance->mailer->Subject = Config::get('app', 'stage') === 'development' ? "Development - " . $subject : $subject;
-      $instance->mailer->Body    = $body;
+      $instance->mailer->Body = $body;
 
       if ($altBody !== '' && $altBody !== false) {
         $instance->mailer->AltBody = $altBody;
       }
 
-      foreach ($attachments as $fn => $a) {
-        if (is_numeric($fn) === false) {
-          $instance->mailer->addAttachment($a, $fn);
-        } else {
-          $instance->mailer->addAttachment($a);
+      if (isset($attachments) && is_array($attachments)) {
+        foreach ($attachments as $fn => $a) {
+          if (is_numeric($fn)) {
+            $instance->mailer->addAttachment($a);
+          } else {
+            $instance->mailer->addAttachment($a, $fn);
+          }
         }
       }
 
       return $instance->mailer->send();
     } catch (Exception $e) {
-      throw new \Exception('Mailer Error: ' . $instance->mailer->ErrorInfo);
+      throw new \Exception($e);
     }
   }
 }

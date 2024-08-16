@@ -27,12 +27,12 @@ class MigrateCommand extends Command
   {
     $migrationDirectories = [
       ROOT_DIR . '/database/migrations',
-      __DIR__ . '/../../Database/Migrations'
+      __DIR__ . '/../../../../database/src/Database/Migrations'
     ];
 
     $seederDirectories = [
       ROOT_DIR . '/database/seeders',
-      __DIR__ . '/../../Database/Seeders'
+      __DIR__ . '/../../../../database/src/Database/Seeders'
     ];
 
     $this->migrate($migrationDirectories, $output);
@@ -46,7 +46,7 @@ class MigrateCommand extends Command
   {
     $finder = new Finder();
     $finder->files()->in($directories)->name('*.php');
-  
+
     $pulseFrameMigrations = [];
     $appMigrations = [];
 
@@ -101,7 +101,7 @@ class MigrateCommand extends Command
         $output->writeln('<error>Migration class not found: ' . $className['name'] . '</error>');
       }
     }
-  }  
+  }
 
   private function seed(array $directories, OutputInterface $output): void
   {
