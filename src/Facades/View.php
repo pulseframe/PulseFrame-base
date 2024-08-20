@@ -122,19 +122,19 @@ class View
    */
   private static function isViteServerRunning(): bool
   {
-    $viteServerUrl = Env::get("vite_dev");
+    $viteServerUrl = Env::get("app.vite_dev") . "/@vite/client";
     $headers = @get_headers($viteServerUrl);
 
     return $headers && strpos($headers[0], '200') !== false;
   }
 
-  public static function assetUrl(string $path): string
+  public static function assetUrl(string $path, $data): string
   {
-    if (env('IS_DEV') == 'true' || env('DEBUG', false)) {
-      return '/assets/' . ltrim($path, '/');
+    if ($data['isDev'] == 'true' || $data['settings']['debug'] === false) {
+      return Env::get("app.vite_dev") . '/' . ltrim($path, '/');
     }
 
-    return 'http://0.0.0.0/assets/' . ltrim($path, '/');
+    return Env::get("app.vite_dev") . '/assets/' . ltrim($path, '/');
   }
 
   /**
@@ -176,14 +176,15 @@ class View
 
         self::$view->addFunction(
           'assetUrl',
-          function ($path) {
-            return $this->assetUrl($path);
+          function ($path) use ($data) {
+            return $this->assetUrl($path, $data['app']);
           }
         );
 
-        $assetsTemplate = self::$view->render('assets', ['assets' => $assets]);
-
+        $assetsTemplate = self::$view->render('assets', ['assets' => $assets, 'entry' => Config::get('view', 'entry'), 'isDev' => $data['app']['isDev']]);
+        $viteReactRefresh = self::$view->render('ViteReactRefresh', ['isDev' => $data['app']['isDev']]);
         $data['assets'] = $assetsTemplate;
+        $data['viteReactRefresh'] = $viteReactRefresh;
       } catch (\Exception $e) {
         return self::$view->render(self::$errorPage, [
           'status' => Response::HTTP_INTERNAL_SERVER_ERROR,

@@ -32,6 +32,16 @@ class Application
 
     $this->loadSingletons();
 
+    $storagePath = $_ENV['storage_path'];
+
+    if (strpos($storagePath, './') === 0) {
+      $_ENV['storage_path'] = ROOT_DIR . substr($storagePath, 2);
+    } elseif (strpos($storagePath, '/') === 0) {
+      $_ENV['storage_path'] = $storagePath;
+    } else {
+      throw new \Exception('Invalid storage path format.');
+    }
+
     if (empty(Env::get('app.key'))) {
       throw new \Exception("It seems there is no app key... You may have forgotten to generate it.");
     }
